@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,7 +18,8 @@ func init() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
 		if r.PostFormValue("token") == tokenID {
-			if strings.Contains(r.PostFormValue("text"), "grepbot") {
+			fmt.Println(r.PostFormValue("user_name"))
+			if strings.Contains(r.PostFormValue("text"), "grepbot") && r.PostFormValue("user_name") != "slackbot" {
 				grepMessage := SplitText(r.PostFormValue("text"))
 				cmd := rungrep(grepMessage)
 				var resp WebResponse
@@ -28,10 +30,10 @@ func init() {
 					log.Fatal(err)
 
 				}
-				fullMessage := FormatMessage(r)
-				Writelog(fullMessage)
 				w.Write(b)
 			}
+			fullMessage := FormatMessage(r)
+			Writelog(fullMessage)
 		} else {
 			var rejectresp WebResponse
 			rejectresp.Username = "grepbot"
