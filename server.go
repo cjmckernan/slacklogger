@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,11 +13,12 @@ type WebResponse struct {
 	Text     string `json:"text"`
 }
 
+//Handles a request at the root and processes if the token is correct
 func init() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-
+		//Checks token is same as one on launch
 		if r.PostFormValue("token") == tokenID {
-			fmt.Println(r.PostFormValue("user_name"))
+			//Check that values its not a bot trying to grep itself >_>
 			if strings.Contains(r.PostFormValue("text"), "grepbot") && r.PostFormValue("user_name") != "slackbot" {
 				grepMessage := SplitText(r.PostFormValue("text"))
 				cmd := rungrep(grepMessage)
@@ -49,6 +49,7 @@ func init() {
 
 }
 
+//Starts server on the port that was passed through on start
 func Serve(port int) {
 	log.Printf("Starting server on %d", port)
 	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
